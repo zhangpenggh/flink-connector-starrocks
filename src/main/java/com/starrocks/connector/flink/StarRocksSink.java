@@ -14,10 +14,10 @@
 
 package com.starrocks.connector.flink;
 
-import com.starrocks.connector.flink.row.StarRocksGenericRowTransformer;
-import com.starrocks.connector.flink.row.StarRocksSinkRowBuilder;
-import com.starrocks.connector.flink.table.StarRocksDynamicSinkFunction;
-import com.starrocks.connector.flink.table.StarRocksSinkOptions;
+import com.starrocks.connector.flink.row.sink.StarRocksGenericRowTransformer;
+import com.starrocks.connector.flink.row.sink.StarRocksSinkRowBuilder;
+import com.starrocks.connector.flink.table.sink.StarRocksDynamicSinkFunction;
+import com.starrocks.connector.flink.table.sink.StarRocksSinkOptions;
 
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.table.api.TableSchema;
@@ -31,9 +31,11 @@ public class StarRocksSink {
      * Therefore, objects can not be {@link org.apache.flink.api.common.ExecutionConfig#enableObjectReuse() reused}.
      * </p>
      *
-     * @param flinkTableSchema  TableSchema of the all columns with DataType
+     * @param flinkTableSchema     TableSchema of the all columns with DataType
      * @param sinkOptions          StarRocksSinkOptions as the document listed, such as jdbc-url, load-url, batch size and maximum retries
-     * @param <T>               type of data in {@link org.apache.flink.streaming.runtime.streamrecord.StreamRecord StreamRecord}.
+     * @param rowDataTransformer   StarRocksSinkRowBuilder which would be used to transform the upstream record.
+     * @param <T>                  type of data in {@link org.apache.flink.streaming.runtime.streamrecord.StreamRecord StreamRecord}.
+     * @return SinkFunction        SinkFunction that could be add to a stream.
      */
     public static <T> SinkFunction<T> sink(
         TableSchema flinkTableSchema,
@@ -53,7 +55,8 @@ public class StarRocksSink {
      * Therefore, objects can not be {@link org.apache.flink.api.common.ExecutionConfig#enableObjectReuse() reused}.
      * </p>
      *
-     * @param sinkOptions          StarRocksSinkOptions as the document listed, such as jdbc-url, load-url, batch size and maximum retries
+     * @param sinkOptions            StarRocksSinkOptions as the document listed, such as jdbc-url, load-url, batch size and maximum retries
+     * @return SinkFunction          SinkFunction that could be add to a stream.
      */
     public static SinkFunction<String> sink(StarRocksSinkOptions sinkOptions) {
         return new StarRocksDynamicSinkFunction<>(sinkOptions);
